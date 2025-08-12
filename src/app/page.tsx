@@ -201,7 +201,7 @@ export default function Portfolio() {
         description:
           "Developed a personal portfolio website using Next.js and Tailwind CSS. Implemented responsive design, smooth scrolling, and dynamic content loading. Deployed on Vercel with CI/CD integration.",
         technologies: ["Next.js", "Tailwind CSS", "Vercel", "JavaScript"],
-        link: "",
+        link: "https://github.com/Nagendra2k00/portfolio",
       },
       {
         id: 2,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,17 +23,84 @@ import {
   Map,
   Menu,
   X,
-  ChevronDown
+  ChevronDown,
 } from "lucide-react";
+import emailjs from "@emailjs/browser";
+import { toast } from "sonner";
 
 export default function Portfolio() {
   const [activeSection, setActiveSection] = useState("hero");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+  const formRef = useRef(null);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
       setActiveSection(sectionId);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus("");
+    setErrorMessage("");
+    const serviceId =
+      process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ||
+      import.meta.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+    const templateId =
+      process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ||
+      import.meta.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+    const publicKey =
+      process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ||
+      import.meta.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+
+    if (formRef.current) {
+      emailjs
+        .sendForm(
+          serviceId,
+          templateId,
+          formRef.current as HTMLFormElement,
+          publicKey
+        )
+        .then((result) => {
+          console.log("Email sent successfully:", result.text);
+          setIsSubmitting(false);
+          setSubmitStatus("success");
+          setSuccessMessage("Message sent successfully");
+          setFormData({
+            name: "",
+            email: "",
+            subject: "",
+            message: "",
+          });
+
+          // Reset status after 5 seconds
+          setTimeout(() => setSubmitStatus(""), 5000);
+        })
+        .catch((error) => {
+          console.error("Email sending failed:", error.text);
+          setIsSubmitting(false);
+          setSubmitStatus("error");
+          setErrorMessage("Failed to send message. Please try again later.");
+
+          // Reset error after 5 seconds
+          setTimeout(() => {
+            setSubmitStatus("");
+            setErrorMessage("");
+            setSuccessMessage("");
+          }, 5000);
+        });
     }
   };
 
@@ -636,36 +703,77 @@ export default function Portfolio() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-4">
+                <form
+                  ref={formRef}
+                  onSubmit={handleSubmit}
+                  className="space-y-4"
+                >
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-medium mb-1">Name</label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={(e) =>
+                          setFormData({ ...formData, name: e.target.value })
+                        }
+                        required
+                        className="w-full px-3 py-2 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="Your Name"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-medium mb-1">Email</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={(e) =>
+                          setFormData({ ...formData, email: e.target.value })
+                        }
+                        required
+                        className="w-full px-3 py-2 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="your.email@example.com"
+                      />
+                    </div>
+                  </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium mb-1">Name</label>
+                    <label className="text-sm font-medium">Subject</label>
                     <input
                       type="text"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={(e) =>
+                        setFormData({ ...formData, subject: e.target.value })
+                      }
                       className="w-full px-3 py-2 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                      placeholder="Your Name"
+                      placeholder="Subject"
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium mb-1">Email</label>
-                    <input
-                      type="email"
+                    <label className="text-sm font-medium">Message</label>
+                    <textarea
+                      rows={4}
+                      name="message"
+                      value={formData.message}
+                      onChange={(e) =>
+                        setFormData({ ...formData, message: e.target.value })
+                      }
+                      required
                       className="w-full px-3 py-2 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                      placeholder="your.email@example.com"
-                    />
+                      placeholder="Your message..."
+                    ></textarea>
                   </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium">Message</label>
-                  <textarea
-                    rows={4}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                    placeholder="Your message..."
-                  ></textarea>
-                </div>
-                <Button className="w-full button-glow" size="lg">
-                  <Mail className="mr-2 h-4 w-4" />
-                  Send Message
-                </Button>
+                  <Button
+                    type="submit"
+                    className="w-full button-glow"
+                    size="lg"
+                  >
+                    <Mail className="mr-2 h-4 w-4" />
+                    Send Message
+                  </Button>
+                </form>
               </CardContent>
             </Card>
             <div className="text-center mt-8">
@@ -707,6 +815,8 @@ export default function Portfolio() {
           <p>&copy; 2024 {portfolioData.name}. All rights reserved.</p>
         </div>
       </footer>
+      {submitStatus === "success" && toast(`${successMessage}`)}
+      {submitStatus === "error" && toast(`${errorMessage}`)}
     </div>
   );
 }

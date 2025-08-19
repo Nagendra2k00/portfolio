@@ -273,6 +273,7 @@ export default function Portfolio() {
           "Developed a personal portfolio website using Next.js and Tailwind CSS. Implemented responsive design, smooth scrolling, and dynamic content loading. Deployed on Vercel with CI/CD integration.",
         technologies: ["Next.js", "Tailwind CSS", "Vercel", "JavaScript"],
         link: "https://github.com/Nagendra2k00/portfolio",
+        website: "https://portfolio-liart-gamma-84.vercel.app/",
       },
       {
         id: 2,
@@ -647,9 +648,20 @@ export default function Portfolio() {
                     className="button-glow cursor-pointer"
                     onClick={() => window.open(project.link, "_blank")}
                   >
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    View Project
+                    <Github className="h-6 w-6" />
+                    Code
                   </Button>
+                  {project.website && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="button-glow cursor-pointer"
+                      onClick={() => window.open(project.website, "_blank")}
+                    >
+                      <ExternalLink className="h-6 w-6" />
+                      Website
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ))}

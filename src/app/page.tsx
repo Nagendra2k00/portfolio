@@ -751,6 +751,7 @@ export default function Portfolio() {
                       onChange={(e) =>
                         setFormData({ ...formData, subject: e.target.value })
                       }
+                      required
                       className="w-full px-3 py-2 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                       placeholder="Subject"
                     />
@@ -771,11 +772,12 @@ export default function Portfolio() {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full button-glow"
+                    className="w-full button-glow cursor-pointer"
                     size="lg"
+                    disabled={isSubmitting}
                   >
                     <Mail className="mr-2 h-4 w-4" />
-                    Send Message
+                    {isSubmitting ? "Sending..." : "Send Message"}
                   </Button>
                 </form>
               </CardContent>

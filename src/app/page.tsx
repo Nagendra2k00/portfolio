@@ -50,20 +50,24 @@ export default function Portfolio() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus("");
     setErrorMessage("");
-    const serviceId =
-      process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ||
-      import.meta.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
-    const templateId =
-      process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ||
-      import.meta.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
-    const publicKey =
-      process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ||
-      import.meta.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+
+    if (!serviceId || !templateId || !publicKey) {
+      console.error("EmailJS environment variables are not configured");
+      setIsSubmitting(false);
+      setSubmitStatus("error");
+      setErrorMessage(
+        "Email service is not configured. Please try again later."
+      );
+      return;
+    }
 
     if (formRef.current) {
       emailjs
